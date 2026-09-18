@@ -11,6 +11,20 @@ function renderBar(fraction) {
   return chalk.cyan("█".repeat(filled)) + chalk.dim("░".repeat(BAR_WIDTH - filled));
 }
 
+// If the rendered line is longer than the terminal is wide, the terminal wraps it onto
+// a second row - and `\r` only rewinds to the start of the CURRENT row, not back up to
+// where the line actually started. Every following tick then prints below the last one
+// instead of overwriting it, so the bar scrolls the screen instead of updating in
+// place. Truncating the variable-length part (the label) to whatever room is actually
+// left keeps the whole line within one row. Truncating the plain text before any chalk
+// color is applied avoids cutting an ANSI escape sequence in half.
+function truncateToWidth(text, maxWidth) {
+  if (maxWidth <= 0) return "";
+  if (text.length <= maxWidth) return text;
+  if (maxWidth === 1) return "…";
+  return `${text.slice(0, maxWidth - 1)}…`;
+}
+
 // Tracks real completed work across collectors running in parallel, then predicts the
 // overall finish time from each collector's OWN observed rate in this run (elapsed /
 // fractionDone, extrapolated) - not a guess from a past run, and not a naive item
@@ -82,8 +96,13 @@ export class ScanTracker {
     const percent = String(Math.round(fraction * 100)).padStart(3);
     const elapsedSeconds = ((Date.now() - this.startedAt) / 1000).toFixed(0);
     const label = activeDescriptions.length > 0 ? activeDescriptions.join(", ") : "finishing up";
+
+    const plainPrefix = `  ${" ".repeat(BAR_WIDTH)} ${percent}%  ${elapsedSeconds}s  `;
+    const terminalWidth = process.stdout.columns || 100;
+    const truncatedLabel = truncateToWidth(label, Math.max(terminalWidth - plainPrefix.length - 1, 0));
+
     clearLine();
-    process.stdout.write(`  ${renderBar(fraction)} ${percent}%  ${elapsedSeconds}s  ${chalk.dim(label)}`);
+    process.stdout.write(`  ${renderBar(fraction)} ${percent}%  ${elapsedSeconds}s  ${chalk.dim(truncatedLabel)}`);
   }
 
   stop() {
@@ -118,8 +137,13 @@ export class LiveCounterStatus {
   render() {
     const elapsedSeconds = ((Date.now() - this.startedAt) / 1000).toFixed(0);
     const progressText = this.count > 0 ? `${this.count.toLocaleString()} ${this.unit ?? "items"}, ` : "";
+    const suffix = `${progressText}${elapsedSeconds}s`;
+
+    const terminalWidth = process.stdout.columns || 100;
+    const truncatedLabel = truncateToWidth(this.label, Math.max(terminalWidth - suffix.length - 4, 0));
+
     clearLine();
-    process.stdout.write(`  ${this.label} ${chalk.dim(`${progressText}${elapsedSeconds}s`)}`);
+    process.stdout.write(`  ${truncatedLabel} ${chalk.dim(suffix)}`);
   }
 
   stop(outcome) {
