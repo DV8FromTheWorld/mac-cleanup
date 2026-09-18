@@ -1,0 +1,17 @@
+{
+  "name": "disk-cleanup",
+  "version": "1.0.0",
+  "description": "Interactive scanner/cleaner for the usual suspects that eat disk space on this Mac (repo build artifacts, nix store, iOS simulators, dev tool caches).",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "disk-cleanup": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "prompts": "^2.4.2"
+  }
+}
