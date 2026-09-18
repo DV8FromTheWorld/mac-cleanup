@@ -5,6 +5,8 @@ artifacts (cargo/bazel), the nix store, iOS Simulator runtimes, Xcode caches, pn
 global store, and `~/Library/Caches`. Ships as a globally-installed `mac-cleanup`
 command.
 
+https://github.com/user-attachments/assets/128a4967-7d0a-4645-94e7-5bb837e13460
+
 ## Install (once)
 
 ```sh
