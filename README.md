@@ -2,7 +2,7 @@
 
 Interactive scanner/cleaner for the recurring disk-space sinks on a dev Mac: repo build
 artifacts (cargo/bazel), the nix store, iOS Simulator runtimes, Xcode caches, pnpm's
-global store, and `~/Library/Caches`. Ships as a globally-installed `disk-cleanup`
+global store, and `~/Library/Caches`. Ships as a globally-installed `mac-cleanup`
 command.
 
 ## Install (once)
@@ -14,17 +14,17 @@ npm install
 pnpm link --global
 ```
 
-This symlinks the `disk-cleanup` command onto your PATH via pnpm's global bin -
+This symlinks the `mac-cleanup` command onto your PATH via pnpm's global bin -
 edits to the source here take effect immediately, no reinstall needed. If you ever
-move or delete this checkout, run `pnpm uninstall --global disk-cleanup` first.
+move or delete this checkout, run `pnpm uninstall --global mac-cleanup` first.
 
 ## Usage
 
 Runs from anywhere, no `cd` required:
 
 ```sh
-disk-cleanup             # scan, then pick items with a checkbox prompt, confirm, clean
-disk-cleanup --dry-run   # just scan and print the full annotated report, delete nothing
+mac-cleanup             # scan, then pick items with a checkbox prompt, confirm, clean
+mac-cleanup --dry-run   # just scan and print the full annotated report, delete nothing
 ```
 
 The interactive picker already shows size + tier per line, so `--dry-run` isn't a
